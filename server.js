@@ -2,6 +2,7 @@
 //calling the npms
 var express = require("express");
 var mongoose = require("mongoose");
+var logger = require("morgan");
 var axios = require("axios");
 var cheerio = require("cheerio");
 
@@ -9,28 +10,34 @@ var cheerio = require("cheerio");
 var db = ("./models");
 
 //Initializing express 
-var PORT = 5000;
+var PORT = 3000;
 var app = express();
 
 //middlewear configuration
 //Parse req body as JSON
+app.use(logger("dev"));
 app.use(express.urlencoded({
-    extended: true }));
+    extended: true
+}));
 app.use(express.json());
 //make public a staic folder
 app.use(express.static("public")
 );
 
 //connect to the mongo db
-// mongoose.connect("mongodb://localhost/unit18Populater", {
-//     useNewUrlParser: true });
+mongoose.connect("mongodb://localhost/", {
+    useNewUrlParser: true });
 
 
 
 
 //Server start code
-app.listen(PORT, function(){
-console.log("App running on port " + PORT + "!");
+app.listen(PORT, function (error) {
+    if (error) {
+        console.log(error)
+    } else {
+        console.log("App running on port " + PORT + "!");
+    };
 });
 
 
