@@ -24,7 +24,7 @@ app.use(express.json());
 //Making public folder static
 app.use(express.static("public"));
 
-// Connect to the Mongo DB
+// Connecting to the Mongo DB
 mongoose.connect("mongodb://localhost/mongo-db-scraper", { useNewUrlParser: true});
 
 
@@ -40,13 +40,19 @@ app.get("/scrape", (req, res) => {
 
     result.title =$(this).children("a").text();
     result.link =$(this).childen("a").attr("href");
-  })
 
-  })
-
-
-
-})
+    db.article.create(result).then(dbArticle => {
+      console.log(dbArticle)
+    })
+    .catch(err => {
+      console.log(err);
+    });
+  });
+  
+//Message on front end
+res.send("The deed is done");
+  });
+});
 
 
 
