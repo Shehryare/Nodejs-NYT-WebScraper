@@ -4,12 +4,12 @@ var Schema = mongoose.Schema
 
 var ArticleSchema = new Schema({
     title: {
-        type: string,
+        type: String,
         required: true
     },
 
     summary: {
-        type: string,
+        type: String,
         required: true
     },
 
