@@ -37,6 +37,9 @@ app.get("/scrape", (req, res) => {
   //grabing every h2 within an article tag
   $("article h2").each(function(i, element){
     var result = {};
+
+    result.title =$(this).children("a").text();
+    result.link =$(this).childen("a").attr("href");
   })
 
   })
