@@ -1,67 +1,167 @@
-$.getJSON("/articles", data => {
-    for(var i=0; i < data.length; i++){
-        //grabs the articles and turns it into a JSON file and displays the info on the page
-    $("#articles").append("<p data-id='" + data[i]._id + "'>" + data[i].title + "<br />" + data[i].link + "</p>");
+$(document).ready(function () {
+    $(document).on("click", ".scrape-new", scrapeArticle);
+    $(document).on("click", ".clear", clearArticle);
+    $(document).on("click", ".clear-saved", clearSavedArticle);
+    $(document).on("click", ".save", saveArticle);
+    $(document).on("click", ".delete", deleteSavedArticle);
+    $(document).on("click", ".notes", addNotesToArticle);
+    $(document).on("click", ".note-save", saveNote);
+    $(document).on("click", ".note-delete", deleteNote);
+
+    // This function handles the user clicking any "scrape new article" buttons
+    function scrapeArticle() {
+        $(".article-container").prepend('<div class="loader"></div>');
+        $.get("/api/fetch").then(function (data) {
+            console.log(data)
+            setTimeout(
+                function () {
+                    window.location.href = "/";
+                }, 2000);
+        });
+    }
+
+    //This function sends request to server to delete unsaved article in the collection
+    function clearArticle() {
+        $.get("/api/clear").then(function (data) {
+            console.log(data)
+            $(".articleContainer").empty();
+            location.reload();
+        });
+    }
+
+    //This function sends request to server to delete unsaved article in the collection
+    function clearSavedArticle() {
+        $.get("/api/clear/saved").then(function (data) {
+            console.log(data)
+            $(".articleContainer").empty();
+            location.reload();
+        });
+    }
+
+    //This function is called when user click save article, send a request to server to update the document in collection to be saved.
+    function saveArticle() {
+        // get ID od the article to save
+        var articleID = $(this)
+            .parents(".card")
+            .data();
+
+        // removes article from home page. the article is available on Saved page.
+        $(this)
+            .parents(".card")
+            .remove();
+
+        // put method to update in database to save article for comments
+        $.ajax({
+            method: "PUT",
+            url: "/api/save/" + articleID._id
+        }).then(function (data) {
+            console.log(data);
+        });
+    }
+
+    //this function called when user wants to delete specific article
+    function deleteSavedArticle() {
+        // get ID od the article to save
+        var articleID = $(this)
+            .parents(".card")
+            .data();
+
+        // removes article from saved page.
+        $(this)
+            .parents(".card")
+            .remove();
+
+        $.get("/api/deleteSaved/" + articleID._id);
+    }
+
+    //This fucntion gets article id crates a modal with text area and adds a note
+    function addNotesToArticle() {
+        var articleID = $(this)
+            .parents(".card")
+            .data();
+
+        $.get("/api/notes/" + articleID._id).then(function (data) {
+            console.log(data)
+            // Constructing our initial HTML to add to the notes modal
+            var modalText = $("<div class='container-fluid text-center'>").append(
+                $("<h4>").text("Notes For Article: " + articleID._id),
+                $("<hr>"),
+                $("<ul class='list-group note-container'>"),
+                $("<textarea placeholder='New Note' rows='4' cols='50'>"),
+                $("<button class='btn btn-success note-save'>Save Note</button>")
+            );
+            console.log(modalText)
+            // Adding the formatted HTML to the note modal
+            bootbox.dialog({
+                message: modalText,
+                closeButton: true
+            });
+            var noteData = {
+                _id: articleID._id,
+                notes: data || []
+            };
+            console.log('noteData:' + JSON.stringify(noteData))
+            //Pulling article ID to be accessible in the save notes method
+            $(".note-save").data("article", noteData);
+            // getAllNotes will populate the actual note HTML inside of the modal we just created/opened
+            getAllNotes(noteData);
+        });
+    }
+
+    // This function called when user click on X to delete a note
+    function deleteNote() {
+        // First we grab the id of the note we want to delete
+        // We stored this data on the delete button when we created it
+        var noteID = $(this).data("_id");
+        // AJAX request to server to delete note
+        $.ajax({
+            url: "/api/notes/" + noteID,
+            method: "DELETE"
+        }).then(function () {
+            // When done, hide the modal
+            bootbox.hideAll();
+        });
+    }
+
+    //Function called when user clicks save button on the modal
+    function saveNote() {
+        var noteData;
+        var newNote = $(".bootbox-body textarea")
+            .val()
+            .trim();
+        console.log(newNote);
+        if (newNote) {
+            noteData = { _headlineId: $(this).data("article")._id, noteText: newNote };
+            console.log(noteData);
+            $.post("/api/notes", noteData).then(function () {
+                // When complete, close the modal
+                bootbox.hideAll();
+            });
+        }
+    }
+
+    //Display all notes related to article
+    function getAllNotes(data) {
+        var notesToRender = [];
+        var currentNote;
+        if (!data.notes.length) {
+            // If we have no notes, just display a message explaining this
+            currentNote = $("<li class='list-group-item'>No notes for this article yet.</li>");
+            notesToRender.push(currentNote);
+        } else {
+            // If we do have notes, go through each one
+            for (var i = 0; i < data.notes.length; i++) {
+                // Constructs an li element to contain our noteText and a delete button
+                currentNote = $("<li class='list-group-item note'>")
+                    .text(data.notes[i].noteText)
+                    .append($("<button class='btn btn-danger note-delete'>x</button>"));
+                // Store the note id on the delete button for easy access when trying to delete
+                currentNote.children("button").data("_id", data.notes[i]._id);
+                // Adding our currentNote to the notesToRender array
+                notesToRender.push(currentNote);
+            }
+        }
+        // Now append the notesToRender to the note-container inside the note modal
+        $(".note-container").append(notesToRender);
     }
 });
-
-$(document).on("click", "p", function() {
-    // Empty the notes from the note section
-    $("#notes").empty();
-    // Save the id from the p tag
-    var thisId = $(this).attr("data-id");
-  
-    // Now make an ajax call for the Article
-    $.ajax({
-      method: "GET",
-      url: "/articles/" + thisId
-    })
-      // With that done, add the note information to the page
-      .then(function(data) {
-        console.log(data);
-        // The title of the article
-        $("#notes").append("<h2>" + data.title + "</h2>");
-        // An input to enter a new title
-        $("#notes").append("<input id='titleinput' name='title' >");
-        // A textarea to add a new note body
-        $("#notes").append("<textarea id='bodyinput' name='body'></textarea>");
-        // A button to submit a new note, with the id of the article saved to it
-        $("#notes").append("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
-  
-        // If there's a note in the article
-        if (data.note) {
-          // Place the title of the note in the title input
-          $("#titleinput").val(data.note.title);
-          // Place the body of the note in the body textarea
-          $("#bodyinput").val(data.note.body);
-        }
-      });
-  });
-
-  $(document).on("click", "#savenote", function() {
-    // Grab the id associated with the article from the submit button
-    var thisId = $(this).attr("data-id");
-  
-    // Run a POST request to change the note, using what's entered in the inputs
-    $.ajax({
-      method: "POST",
-      url: "/articles/" + thisId,
-      data: {
-        // Value taken from title input
-        title: $("#titleinput").val(),
-        // Value taken from note textarea
-        body: $("#bodyinput").val()
-      }
-    })
-      // With that done
-      .then(function(data) {
-        // Log the response
-        console.log(data);
-        // Empty the notes section
-        $("#notes").empty();
-      });
-  
-    // Also, remove the values entered in the input and textarea for note entry
-    $("#titleinput").val("");
-    $("#bodyinput").val("");
-  });
