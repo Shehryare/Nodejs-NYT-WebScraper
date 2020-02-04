@@ -30,6 +30,10 @@
     margin: 0 auto;
   }
 
+  .jumbotron {
+    background-image: url("../images/trump.jpg");
+    background-size: cover;
+  }
   
 
 @-webkit-keyframes spin {
