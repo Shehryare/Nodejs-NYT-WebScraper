@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var exphbs = require('express-handlebars');
 //Requiring scraping tools
 //Requiring the models folder 
-let db = require("./models");
+let db = require("./models/index");
 
 //declaring port to 8090
 let PORT = process.env.PORT || 8090;
@@ -39,7 +39,7 @@ app.set("view engine", "handlebars");
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoNews";
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
-module.exports = function (app) {
+//module.exports = function (app) {
     // landing page index.handlebars
     app.get('/', function (req, res) {
         db.Article.find({ saved: false }, function (err, data) {
@@ -51,7 +51,7 @@ module.exports = function (app) {
     app.get("/api/fetch", function (req, res) {
         // A GET route for scraping the nytimes website
         // First, we grab the body of the html with axios
-        axios.get("https://www.dailycal.org/").then(function (response) {
+        axios.get("https://www.nytimes.com/").then(function (response) {
             // Then, we load that into cheerio and save it to $ for a shorthand selector
             const $ = cheerio.load(response.data);
 
@@ -61,7 +61,7 @@ module.exports = function (app) {
                 // Save an empty result object
                 var result = {};
                 result.headline = $(element).find("h2").text().trim();
-                result.url = 'https://www.dailycal.org/' + $(element).find("a").attr("href");
+                result.url = 'https://www.nytimes.com/' + $(element).find("a").attr("href");
                 result.summary = $(element).find("p").text().trim();
 
                 if (result.headline !== '' && result.summary !== '') {
@@ -195,7 +195,7 @@ module.exports = function (app) {
             }
         })
     });
-}
+//}
 
 
 app.listen(PORT, function () {
