@@ -1,7 +1,7 @@
 # Welcome to the New York Times scrapper application 
 
 Overview
-A web app that lets users view, save and leave comments/notes on the latest news from the New York Times website. Articles are scraped from the website and is stored in the mongoDB database using an ODM (Object Document Model) mongoose and node.js. Click here to launch deployed application.
+A web app that lets users view, save and leave comments/notes on the latest news from the New York Times website. Articles are scraped from the website and is stored in the mongoDB database using an ODM (Object Document Model) mongoose and node.js. Click here to launch deployed application: https://mysterious-spire-55206.herokuapp.com/
 
 Technologies Used: Node.js, Express.js, MongoDB, Handlebars.
 
