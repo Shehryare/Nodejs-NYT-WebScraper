@@ -6,8 +6,9 @@ A web app that lets users view, save and leave comments/notes on the latest news
 
 Technologies Used: Node.js, Express.js, MongoDB, Handlebars.
 
-For Local Setup
-Clone GitHub repo for this app to your computer.
+For Local Setup:
+
+Clone the GitHub repo to your computer.
 
 Run 'npm install' to install and save these npm packages:
 
