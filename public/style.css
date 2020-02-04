@@ -30,9 +30,7 @@
     margin: 0 auto;
   }
 
-  .btn-danger {
-      text-align: center
-  }
+  
 
 @-webkit-keyframes spin {
     0% { -webkit-transform: rotate(0deg); }
