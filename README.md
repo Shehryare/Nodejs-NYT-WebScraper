@@ -6,9 +6,9 @@ A web app that lets users view, save and leave comments/notes on the latest news
 
 Technologies Used: Node.js, Express.js, MongoDB, Handlebars.
 
-For Local Setup: Clone the GitHub repo to your computer.
+1. For Local Setup: Clone the GitHub repo to your computer.
 
-Run 'npm install' to install and save these npm packages:
+2. Run 'npm install' to install and save these npm packages:
 
 express
 
@@ -26,9 +26,9 @@ body-parser
 
 mongoose-find-or-create
 
-Run npm start to start the application.
+3. Run npm start to start the application.
 
-Open your browser and navigate to http://localhost:3000
+4. Open your browser and navigate to http://localhost:3000
 
 Click on Scrape article to get articles, then click on save.
 
