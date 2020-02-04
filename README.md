@@ -26,7 +26,7 @@ body-parser
 
 mongoose-find-or-create
 
-3. Run npm start to start the application.
+3. Run 'npm start' to start the application.
 
 4. Open your browser and navigate to http://localhost:3000
 
