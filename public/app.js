@@ -9,20 +9,20 @@ $(document).ready(function () {
     $(document).on("click", ".note-delete", deleteNote);
 
     // This function handles the user clicking any "scrape new article" buttons
-    function scrapeArticle() {
+    const scrapeArticle = () => {
         $(".article-container").prepend('<div class="loader"></div>');
         $.get("/api/fetch").then(function (data) {
             console.log(data)
             setTimeout(
-                function () {
+                () => {
                     window.location.href = "/";
                 }, 2000);
         });
     }
 
     //This function sends request to server to delete unsaved article in the collection
-    function clearArticle() {
-        $.get("/api/clear").then(function (data) {
+    const clearArticle = () => {
+        $.get("/api/clear").then((data) => {
             console.log(data)
             $(".articleContainer").empty();
             location.reload();
@@ -30,7 +30,7 @@ $(document).ready(function () {
     }
 
     //This function sends request to server to delete unsaved article in the collection
-    function clearSavedArticle() {
+    const clearSavedArticle = () => {
         $.get("/api/clear/saved").then(function (data) {
             console.log(data)
             $(".articleContainer").empty();
@@ -39,9 +39,9 @@ $(document).ready(function () {
     }
 
     //This function is called when user click save article, send a request to server to update the document in collection to be saved.
-    function saveArticle() {
+    const saveArticle = () => {
         // get ID od the article to save
-        var articleID = $(this)
+        let articleID = $(this)
             .parents(".card")
             .data();
 
@@ -54,15 +54,15 @@ $(document).ready(function () {
         $.ajax({
             method: "PUT",
             url: "/api/save/" + articleID._id
-        }).then(function (data) {
+        }).then((data) => {
             console.log(data);
         });
     }
 
     //this function called when user wants to delete specific article
-    function deleteSavedArticle() {
+    const deleteSavedArticle = () => {
         // get ID od the article to save
-        var articleID = $(this)
+        let articleID = $(this)
             .parents(".card")
             .data();
 
@@ -74,29 +74,29 @@ $(document).ready(function () {
         $.get("/api/deleteSaved/" + articleID._id);
     }
 
-    //This fucntion gets article id crates a modal with text area and adds a note
-    function addNotesToArticle() {
-        var articleID = $(this)
+    //This fucntion gets article id crates a model with text area and adds a note
+    const addNotesToArticle = () => {
+        let articleID = $(this)
             .parents(".card")
             .data();
 
-        $.get("/api/notes/" + articleID._id).then(function (data) {
+        $.get("/api/notes/" + articleID._id).then((data) => {
             console.log(data)
-            // Constructing our initial HTML to add to the notes modal
-            var modalText = $("<div class='container-fluid text-center'>").append(
+            // Constructing our initial HTML to add to the notes model
+            const modelText = $("<div class='container-fluid text-center'>").append(
                 $("<h4>").text("Notes For Article: " + articleID._id),
                 $("<hr>"),
                 $("<ul class='list-group note-container'>"),
                 $("<textarea placeholder='New Note' rows='4' cols='50'>"),
                 $("<button class='btn btn-success note-save'>Save Note</button>")
             );
-            console.log(modalText)
+            console.log(modelText)
             // Adding the formatted HTML to the note modal
             bootbox.dialog({
                 message: modalText,
                 closeButton: true
             });
-            var noteData = {
+            let noteData = {
                 _id: articleID._id,
                 notes: data || []
             };
@@ -109,29 +109,32 @@ $(document).ready(function () {
     }
 
     // This function called when user click on X to delete a note
-    function deleteNote() {
+    const deleteNote = () => {
         // First we grab the id of the note we want to delete
         // We stored this data on the delete button when we created it
-        var noteID = $(this).data("_id");
+        let noteID = $(this).data("_id");
         // AJAX request to server to delete note
         $.ajax({
             url: "/api/notes/" + noteID,
             method: "DELETE"
-        }).then(function () {
+        }).then(() => {
             // When done, hide the modal
             bootbox.hideAll();
         });
     }
 
     //Function called when user clicks save button on the modal
-    function saveNote() {
-        var noteData;
-        var newNote = $(".bootbox-body textarea")
+    const saveNote = () => {
+        let noteData;
+        let newNote = $(".bootbox-body textarea")
             .val()
             .trim();
         console.log(newNote);
+
         if (newNote) {
-            noteData = { _headlineId: $(this).data("article")._id, noteText: newNote };
+            noteData = { 
+                _headlineId: $(this).data("article")._id, noteText: newNote 
+            };
             console.log(noteData);
             $.post("/api/notes", noteData).then(function () {
                 // When complete, close the modal
@@ -141,16 +144,16 @@ $(document).ready(function () {
     }
 
     //Display all notes related to article
-    function getAllNotes(data) {
-        var notesToRender = [];
-        var currentNote;
+    const getAllNotes = (data) => {
+        let notesToRender = [];
+        let currentNote;
         if (!data.notes.length) {
             // If we have no notes, just display a message explaining this
             currentNote = $("<li class='list-group-item'>No notes for this article yet.</li>");
             notesToRender.push(currentNote);
         } else {
             // If we do have notes, go through each one
-            for (var i = 0; i < data.notes.length; i++) {
+            for (let i = 0; i < data.notes.length; i++) {
                 // Constructs an li element to contain our noteText and a delete button
                 currentNote = $("<li class='list-group-item note'>")
                     .text(data.notes[i].noteText)
